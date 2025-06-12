@@ -1,0 +1,35 @@
+name: unicalc
+description: تطبيق UniCalc لحساب المعدل الجامعي
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.18.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.0.15
+  google_fonts: ^5.0.0
+  easy_localization: ^3.0.3
+  # قم بإضافة أي تبعيات أخرى تحتاجها هنا
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0 # للتأكد من وجود هذا للتحليل
+
+flutter:
+  uses-material-design: true
+
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700
+
+  assets:
+    - assets/langs/
+    - assets/icons/
+    # إذا كان لديك أي أيقونات أو صور أخرى، أضف مسارها هنا
