@@ -12,6 +12,7 @@ dependencies:
   shared_preferences: ^2.0.15
   google_fonts: ^5.0.0
   easy_localization: ^3.0.3
+  cupertino_icons: ^1.0.2
   # قم بإضافة أي تبعيات أخرى تحتاجها هنا
 
 dev_dependencies:
