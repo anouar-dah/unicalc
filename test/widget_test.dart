@@ -1,47 +1,65 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:easy_localization/easy_localization.dart';
 
-// تأكد من أن اسم المجلد الخاص بمشروعك صحيح هنا (مثلاً unicalc أو UniCalc)
-import 'package:unicalc/main.dart'; // افترض أن اسم المجلد هو unicalc
+import 'package:unicalc/main.dart'; // اسم المشروع unicalc
 
 void main() {
-  testWidgets('App starts without errors', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    // قم بتشغيل UniCalcApp بدلاً من MyApp
-    await tester.pumpWidget(const UniCalcApp());
+  group('UniCalcApp tests', () {
+    setUpAll(() async {
+      WidgetsFlutterBinding.ensureInitialized();
+      await EasyLocalization.ensureInitialized();
+      EasyLocalization.logger.enableBuildModes = [];
+    });
 
-    // هذا الاختبار الافتراضي يتحقق من وجود نص معين.
-    // نظرًا لأن تطبيق UniCalc ليس لديه عداد افتراضي، يمكننا التحقق من وجود عنوان التطبيق
-    // أو أي نص آخر تراه عند بدء التشغيل.
-    // على سبيل المثال، التحقق من وجود النص "University Average Calculator" أو "حاسبة المعدل الجامعي"
-    // بعد تشغيل التطبيق (مع الأخذ في الاعتبار الترجمة).
+    testWidgets('App starts and displays home screen content', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        EasyLocalization(
+          supportedLocales: const [Locale('en'), Locale('ar')],
+          path: 'assets/langs',
+          fallbackLocale: const Locale('ar'),
+          child: const UniCalcApp(),
+        ),
+      );
 
-    // مثال على التحقق من نص (قد تحتاج لتعديله بناءً على الشاشة الأولية واللغة)
-    // بما أن الشاشة الأولى هي SplashScreen، يمكننا التحقق من عدم وجود أي خطأ.
-    // أو إذا كانت الشاشة الرئيسية (Home) تظهر مباشرةً بعد التحميل، يمكننا التحقق من عنوانها.
+      await tester.pumpAndSettle(); // انتظار الانتقال من SplashScreen إلى HomeScreen
 
-    // بما أن الشاشة الأولى هي SplashScreen التي تنتقل بعد 3 ثواني، الاختبار البسيط قد لا يرى أي نص.
-    // هذا الاختبار هو "smoke test" افتراضي، ولا يختبر وظائف تطبيقك بشكل كامل.
-    // يمكننا فقط التأكد من أن التطبيق يبدأ دون أخطاء فادحة.
-    // يمكننا البحث عن أي نص في SplashScreen أو Home Screen
-    // For example, checking for the app title (translated).
-    expect(find.byType(MaterialApp), findsOneWidget); // التأكد من أن التطبيق يشتغل كـ MaterialApp
-    expect(find.text('حاسبة المعدل الجامعي') | find.text('University Average Calculator'), findsAtLeastOneWidget);
+      // يمكنك إزالة debugDumpApp() الآن إذا أردت، أو الاحتفاظ به للتشخيص المستقبلي
+      // debugDumpApp();
 
-    // إذا كان تطبيقك يحتوي على عداد، هذا الجزء من الاختبار سيكون مفيدًا،
-    // ولكن نظرًا لأنه ليس كذلك، يمكن إزالته أو تعديله ليناسب وظائف تطبيقك.
-    // expect(find.text('0'), findsNothing);
-    // expect(find.text('1'), findsNothing);
-    // await tester.tap(find.byIcon(Icons.add));
-    // await tester.pump();
-    // expect(find.text('0'), findsNothing);
-    // expect(find.text('1'), findsNothing);
+      // التحقق من عنوان AppBar في الشاشة الرئيسية
+      final appTitleFinderAr = find.text('حاسبة المعدل الجامعي');
+      final appTitleFinderEn = find.text('University Average Calculator');
+
+      // نتحقق مما إذا كان النص العربي أو الإنجليزي موجودًا
+      expect(appTitleFinderAr.evaluate().isNotEmpty || appTitleFinderEn.evaluate().isNotEmpty, isTrue,
+        reason: 'Should find the app title in either Arabic or English on the home screen AppBar.');
+
+      // التحقق من زر "إضافة مادة"
+      expect(
+        find.byType(ElevatedButton),
+        findsOneWidget,
+        reason: 'Should find exactly one ElevatedButton on the HomeScreen.',
+      );
+
+      // التحقق من النص الموجود داخل هذا الزر
+      final addButtonTextFinderAr = find.text('إضافة مادة');
+      final addButtonTextFinderEn = find.text('Add Course');
+
+      // نتحقق مما إذا كان النص العربي أو الإنجليزي لزر "إضافة مادة" موجودًا
+      expect(addButtonTextFinderAr.evaluate().isNotEmpty || addButtonTextFinderEn.evaluate().isNotEmpty, isTrue,
+        reason: 'Should find the "Add Course" button text in either Arabic or English.');
+
+      // يمكنك أيضًا اختبار النقر على الزر والانتقال إلى الشاشة التالية (إذا أردت)
+      /*
+      await tester.tap(find.text('إضافة مادة') | find.text('Add Course')); // هذا السطر سيحتاج لتعديل بنفس طريقة find.text
+      await tester.pumpAndSettle();
+
+      final enterCoursesTitleFinderAr = find.text('إدخال المواد');
+      final enterCoursesTitleFinderEn = find.text('Enter Courses');
+      expect(enterCoursesTitleFinderAr.evaluate().isNotEmpty || enterCoursesTitleFinderEn.evaluate().isNotEmpty, isTrue,
+        reason: 'Should be on the Enter Courses screen after tapping the button.');
+      */
+    });
   });
 }
